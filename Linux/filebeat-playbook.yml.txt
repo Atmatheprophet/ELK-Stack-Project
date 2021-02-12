@@ -1,0 +1,30 @@
+---
+- name: File Beat Playbook
+  hosts: webservers
+  become: true
+  tasks:
+
+  - name: Download Metric Beat Deb Download
+    command: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.1-amd64.deb
+
+  - name: Install Deb
+    command: sudo dpkg -i filebeat-7.6.1-amd64.deb
+
+  - name: Copy Filebeat
+    copy:
+      src: /etc/ansible/files/filebeat-config.yml
+      dest: /etc/filebeat/filebeat.yml
+
+  - name: File beat enable
+    command: filebeat modules enable system
+
+  - name: File beat setup
+    command: filebeat setup
+
+  - name: File beat start
+    command: service filebeat start
+
+  - name: Enable Filebeat
+    systemd:
+      name: filebeat
+      enabled: yes
